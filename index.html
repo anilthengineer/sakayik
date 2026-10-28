@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sude 🌸">
+<meta name="theme-color" content="#ffd9ea">
+<meta name="robots" content="noindex, nofollow">
+<title>Sude'ye Şakayık</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#fff3f8;--bg2:#ffd9ea;--pink:#ff7eb6;--pink2:#ff5fa2;--deep:#c2337a;--ink:#5b2142;--fs:clamp(15px,2.5vmin,24px);--slot:clamp(30px,5.2vmin,46px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg2)}
+body{font-family:'Baloo 2',ui-rounded,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--ink);font-size:var(--fs);line-height:1.35;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;border:0;background:none;padding:0;margin:0;cursor:pointer;touch-action:manipulation}
+#app{position:fixed;inset:0;overflow:hidden;background:radial-gradient(130% 90% at 50% 0%,#fffafc 0%,var(--bg1) 40%,var(--bg2) 100%)}
+#stage{position:absolute;inset:0;touch-action:none}
+.lvl{position:absolute;inset:0;overflow:hidden}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden}
+#overlay{position:absolute;inset:0;z-index:50;pointer-events:none}
+.pill{background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:999px;box-shadow:0 4px 14px rgba(194,51,122,.15)}
+
+/* HUD */
+#hud{position:absolute;left:0;right:0;top:0;z-index:20;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 0 calc(12px + env(safe-area-inset-left));pointer-events:none;transition:opacity .5s,transform .5s}
+#hud.hidden{opacity:0;transform:translateY(-20px)}
+#slots{display:flex;gap:4px;padding:5px 8px}
+.slot{width:var(--slot);height:var(--slot);border-radius:50%;border:2px dashed #ffb0d2;display:grid;place-items:center}
+.slot.full{border-color:transparent}
+.slot.pop{animation:slotPop .55s}
+.slot svg{width:118%;height:118%}
+#hud-right{display:flex;gap:8px;align-items:center}
+#lb{padding:5px 12px 7px;min-width:clamp(118px,20vmin,190px);font-size:.78em;font-weight:700;line-height:1.2}
+.lb-top{display:flex;justify-content:space-between;gap:8px;white-space:nowrap}
+.lb-bar{height:6px;border-radius:3px;background:#ffe1ee;margin-top:3px;overflow:hidden}
+#lbi{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#ffa3cc,#ff2f7d);transition:width 1s cubic-bezier(.3,1.4,.5,1)}
+#mute{pointer-events:auto;width:var(--slot);height:var(--slot);display:grid;place-items:center;font-size:.95em}
+
+/* Buttons, modal, toast */
+.btn{display:inline-block;font-weight:800;font-size:1.08em;color:#fff;background:linear-gradient(180deg,#ff92c4,#ff5ea2);border-radius:999px;padding:.6em 1.5em;box-shadow:0 5px 0 #d43f85,0 10px 22px rgba(212,63,133,.3);transition:transform .08s,box-shadow .08s;line-height:1.2}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #d43f85,0 4px 10px rgba(212,63,133,.3)}
+.btn.ghost{background:#fff;color:var(--deep);box-shadow:0 5px 0 #f3b7d2,0 10px 22px rgba(212,63,133,.15)}
+.btn.small{font-size:.9em;padding:.5em 1.1em}
+.btn.appear{animation:popIn .4s cubic-bezier(.2,1.5,.4,1)}
+.modal-back{position:absolute;inset:0;background:rgba(91,33,66,.22);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:grid;place-items:center;pointer-events:auto;animation:fadeIn .3s;padding:16px;transition:opacity .25s}
+.modal-back.out{opacity:0;pointer-events:none}
+.modal{background:#fff;border-radius:28px;padding:1.3em 1.4em 1.5em;max-width:min(92vw,520px);width:100%;text-align:center;box-shadow:0 20px 50px rgba(150,30,90,.25);animation:popIn .45s cubic-bezier(.2,1.4,.4,1);max-height:100%;overflow:auto;touch-action:pan-y}
+.modal h2{margin:.15em 0 .35em;font-size:1.45em;color:var(--deep);line-height:1.15}
+.m-icon{font-size:3em;line-height:1.1}
+.m-body{line-height:1.45}
+.m-body small{color:#a0607f}
+.m-btns{margin-top:1.1em}
+.compliment{margin-top:.8em;font-style:italic;font-weight:600;color:var(--pink2)}
+.lb-alert{margin-top:.9em;background:#fff1f3;border:2px solid #ff5a74;color:#d62845;border-radius:14px;padding:.45em .8em;font-weight:800;animation:alertIn .5s cubic-bezier(.2,1.5,.4,1)}
+.lb-alert small{display:block;font-weight:700;opacity:.85}
+#toast{position:absolute;left:50%;top:21%;transform:translate(-50%,-14px);z-index:35;background:#fff;color:var(--deep);font-weight:800;padding:.5em 1.1em;border-radius:999px;box-shadow:0 8px 24px rgba(194,51,122,.22);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;max-width:92vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* FX */
+.petal,.rp{position:absolute;border-radius:80% 0 80% 0;pointer-events:none}
+.rp{top:0;opacity:.85}
+.rain{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.float{position:absolute;font-weight:800;color:var(--deep);white-space:nowrap;text-shadow:0 2px 0 #fff,0 0 8px #fff;font-size:1.05em}
+.float.big{font-size:1.5em;color:var(--pink2)}
+.float.bad{color:#d62845}
+.speech{position:absolute;background:#fff;border-radius:14px;padding:.35em .75em;font-size:.88em;box-shadow:0 6px 18px rgba(150,30,90,.2);white-space:nowrap;opacity:0}
+.speech b{color:var(--deep)}
+.big-peony{position:absolute;filter:drop-shadow(0 10px 18px rgba(200,40,110,.3))}
+.big-peony svg{width:100%;height:100%}
+.cloth-fly{position:absolute}
+.cloth-fly svg{width:100%;height:100%}
+
+/* Intro */
+.intro{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vmin;padding:24px 16px;text-align:center}
+.intro>*:not(.rain){position:relative;z-index:1}
+.route{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--deep);padding:.4em 1.2em;transition:opacity .4s}
+.route .dots{position:relative;width:clamp(80px,24vmin,230px);height:4px;background:repeating-linear-gradient(90deg,#ff8cc0 0 8px,transparent 8px 16px)}
+.route .dots::after{content:'💗';position:absolute;top:50%;left:0;transform:translate(-50%,-55%);animation:travel 3.2s ease-in-out infinite}
+.box{display:flex;flex-direction:column;align-items:center;animation:bob 2.2s ease-in-out infinite}
+.box.opened{animation:boxOpen .55s forwards}
+.box-emoji{font-size:min(32vmin,250px);line-height:1;filter:drop-shadow(0 14px 18px rgba(150,60,30,.25))}
+.label{background:#fff;border-radius:14px;padding:.6em 1em;margin-top:-3vmin;box-shadow:0 8px 20px rgba(150,30,90,.15);text-align:left;line-height:1.4;border:2px dashed #ffb0d2;transform:rotate(-2deg)}
+.label b{color:var(--deep)}
+.lstamp{display:inline-block;margin-top:.35em;border:2px solid #e0245e;color:#e0245e;border-radius:6px;padding:0 .45em;font-weight:800;transform:rotate(-4deg);font-size:.9em}
+.intro-tip{font-weight:800;color:var(--deep);font-size:1.15em;animation:pulse 1.4s infinite;transition:opacity .3s}
+.intro-sound{font-size:.85em;color:#a0607f;transition:opacity .3s}
+.card{background:#fff;border-radius:28px;padding:1.3em 1.6em 1.6em;max-width:min(92vw,560px);box-shadow:0 20px 50px rgba(150,30,90,.2);animation:popIn .5s cubic-bezier(.2,1.4,.4,1)}
+.card-top{font-size:2.6em;line-height:1}
+.card h1{font-size:1.9em;margin:.1em 0 .2em;color:var(--deep);line-height:1.1}
+.card p{line-height:1.45;margin:.55em 0}
+.card .big{font-size:1.3em;font-weight:800;color:var(--pink2);margin:.7em 0 1em}
+
+/* L1 Washing machine */
+.wash{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4vmin;padding:calc(70px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}
+.wm{--w:min(60vmin,470px,50vh);width:var(--w);height:calc(var(--w)*1.16);background:linear-gradient(160deg,#ffffff,#f6edf2);border-radius:calc(var(--w)*.07);position:relative;box-shadow:0 18px 40px rgba(194,51,122,.22),inset 0 -8px 0 rgba(0,0,0,.04);flex:0 0 auto}
+.wm.shake{animation:wmShake .11s infinite}
+.wm-panel{position:absolute;left:0;right:0;top:0;height:19%;border-bottom:3px solid #f0dbe6;display:flex;align-items:center;gap:4%;padding:0 6%}
+.wm-knob{flex:0 0 auto;width:calc(var(--w)*.12);height:calc(var(--w)*.12);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#ead3df);box-shadow:0 2px 6px rgba(0,0,0,.15);position:relative}
+.wm-knob i{position:absolute;left:45%;top:8%;width:10%;height:36%;background:var(--pink2);border-radius:3px}
+.wm-lcd{flex:1;min-width:0;background:#3b2233;color:#ffb3d6;border-radius:8px;padding:4px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.2;box-shadow:inset 0 2px 6px rgba(0,0,0,.4)}
+.wm-lcd small{display:block;font-size:calc(var(--w)*.029);opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wm-lcd b{display:block;font-size:calc(var(--w)*.042);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px rgba(255,120,190,.7)}
+.wm-leds{flex:0 0 auto;display:flex;flex-direction:column;gap:calc(var(--w)*.012)}
+.wm-leds i{display:block;width:calc(var(--w)*.03);height:calc(var(--w)*.03);border-radius:50%;background:#f3c6da;transition:background .3s,box-shadow .3s}
+.wm-leds i.on{background:#ff3d8b;box-shadow:0 0 8px #ff3d8b}
+.wm-brand{position:absolute;top:21%;left:0;right:0;text-align:center;font-weight:800;font-size:calc(var(--w)*.038);color:#d9a3bf;letter-spacing:.06em}
+.wm-door{position:absolute;left:13%;width:74%;top:29%;height:calc(var(--w)*.74);border-radius:50%;background:radial-gradient(circle,#f1e6ec 58%,#d9c6d1 60%,#efe3ea 66%,#cdb7c4 70%,#e6d7df 72%);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.wm-glass{position:absolute;inset:13%;border-radius:50%;overflow:hidden;-webkit-mask-image:-webkit-radial-gradient(white,black);background:radial-gradient(circle at 50% 50%,#f3f9ff 0%,#cfe4f5 65%,#a9cbe8 100%);box-shadow:inset 0 6px 18px rgba(0,0,0,.25)}
+.wm-drum{position:absolute;inset:0;border-radius:50%;background-image:radial-gradient(circle,rgba(110,130,165,.32) 1.6px,transparent 2.2px);background-size:13px 13px}
+.wm-drum .in{position:absolute;width:36%;height:36%;transform:translate(-50%,-50%) rotate(var(--r))}
+.wm-drum .in svg,.cloth svg{width:100%;height:100%;display:block}
+.wm-water{position:absolute;left:-15%;right:-15%;bottom:-8%;height:46%;background:linear-gradient(180deg,rgba(160,205,255,.5),rgba(120,170,240,.72));border-radius:45% 45% 0 0;transform-origin:50% 100%;opacity:0;transition:opacity .6s}
+.wm.running .wm-water{opacity:1}
+.wm-bubbles{position:absolute;inset:0}
+.bub{position:absolute;bottom:4%;border-radius:50%;background:rgba(255,255,255,.85)}
+.wm-lid{position:absolute;inset:5%;border-radius:50%;transform-origin:0% 50%;transform:perspective(900px) rotateY(-72deg);transition:transform .7s cubic-bezier(.3,1.3,.5,1);border:calc(var(--w)*.034) solid #e2d2db;background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.6),rgba(255,255,255,.06) 38%,rgba(180,210,240,.16) 70%);box-shadow:0 4px 10px rgba(0,0,0,.15)}
+.wm-lid.closed{transform:perspective(900px) rotateY(0deg)}
+.spin-hint{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--w)*.34);font-family:system-ui,sans-serif;font-weight:700;color:#fff;text-shadow:0 0 12px #ff5fa2,0 2px 0 #ff5fa2;pointer-events:none;opacity:0;transition:opacity .3s}
+.spin-hint.on{opacity:.9;animation:spinHint 1.8s linear infinite}
+.basket-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(92vw,560px)}
+.tip{padding:.45em 1.1em;font-weight:700;text-align:center;line-height:1.3}
+.tip small{font-weight:600;color:#a0607f}
+.basket{transition:opacity .4s,transform .4s;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;background:linear-gradient(#f7e2c9,#e8c7a2);padding:12px 16px;border-radius:18px 18px 30px 30px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.08),0 8px 18px rgba(150,90,40,.2)}
+.cloth{width:clamp(56px,10.5vmin,92px);height:clamp(56px,10.5vmin,92px);transition:transform .15s}
+.cloth:active{transform:scale(.88)}
+.cloth.gone{visibility:hidden}
+@media (orientation:landscape){.wash{flex-direction:row}.basket-wrap{max-width:min(40vw,380px)}}
+
+/* L2 Garden */
+.garden{background:linear-gradient(180deg,#ffd0e5 0%,#ffe4dc 40%,#fff1e2 56%)}
+.g-sun{position:absolute;right:12%;top:13%;width:12vmin;height:12vmin;border-radius:50%;background:radial-gradient(circle,#fff6c9,#ffd27a);box-shadow:0 0 40px #ffe0a0}
+.yurt{position:absolute;left:16%;width:50%;top:24%;height:33%;background:linear-gradient(#f9dccb,#efc4ae);border-radius:10px 10px 0 0;box-shadow:inset 0 -10px 0 rgba(0,0,0,.05)}
+.yurt-roof{position:absolute;left:-4%;right:-4%;top:-12%;height:13%;background:linear-gradient(#d77c93,#c2667f);border-radius:12px 12px 4px 4px}
+.yurt-sign{position:absolute;left:50%;top:5%;transform:translateX(-50%);background:#fff;color:var(--deep);font-weight:800;padding:.05em .7em;border-radius:6px;font-size:.85em;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.yurt-wins{position:absolute;left:8%;right:8%;top:24%;bottom:32%;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:12% 8%}
+.yurt-wins i{display:block;background:linear-gradient(#bfe0f5,#eaf6ff);border:3px solid #fff;border-radius:6px}
+.yurt-door{position:absolute;left:42%;width:16%;bottom:0;height:24%;background:#b45d77;border-radius:10px 10px 0 0}
+.ground{position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(#acE5a3,#7fcf86);border-radius:50% 50% 0 0/7% 7% 0 0}
+.deco{position:absolute;transform:translate(-50%,-50%);line-height:1;pointer-events:none;font-size:var(--s);z-index:1}
+.deco.cover{z-index:3}
+.snail{position:absolute;transform:translate(-50%,-50%);font-size:var(--s);line-height:1;padding:2.6vmin;z-index:2}
+.s-flip{display:block;transform:scaleX(var(--fx)) rotate(var(--rot))}
+.s-anim{display:block}
+.snail.found{z-index:4}
+.snail.found .s-anim{animation:found .6s forwards}
+.snail.hint .s-anim{animation:wiggle .45s infinite}
+.snail.hint::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(255,240,120,.55),transparent 65%);animation:pulse 1s infinite}
+.snail.found::after{content:'';position:absolute;inset:1vmin;border:3px solid #ff5fa2;border-radius:50%;animation:ring .7s forwards}
+.snail .bow{position:absolute;left:50%;top:18%;font-size:.5em;transform:translate(-50%,-50%)}
+.butterfly{position:absolute;font-size:5vmin;z-index:3;pointer-events:none;animation:butter 16s linear infinite}
+.counter{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:5;font-weight:800;padding:.35em 1.2em;font-size:1.1em;white-space:nowrap}
+.counter b{color:var(--deep)}
+
+/* L3 Çiğköfte */
+.cig{background:linear-gradient(180deg,#ffe0ee 0%,#fff1e2 72%)}
+.cig-table{position:absolute;left:0;right:0;bottom:0;height:13%;background:linear-gradient(#e9b98a,#d39663);box-shadow:inset 0 6px 0 rgba(255,255,255,.25)}
+.cig-hud{position:absolute;top:calc(70px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:.35em 1.1em;font-weight:800;z-index:5;white-space:nowrap}
+.bar{height:10px;border-radius:5px;background:#ffe1ee;overflow:hidden;width:clamp(110px,24vmin,230px)}
+.bar i{display:block;height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#ffa3cc,#ff2f7d);transition:width .3s}
+.cig-hud .bar i{background:linear-gradient(90deg,#e0673d,#a3301b)}
+.item{position:absolute;left:0;top:0;line-height:1;pointer-events:none;will-change:transform;transition:opacity .4s}
+.bowl{position:absolute;left:0;bottom:calc(8% + env(safe-area-inset-bottom));will-change:transform;z-index:2}
+.bowl-in{position:absolute;inset:0}
+.bowl-in.squish{animation:squish .25s}
+.bowl-in.shake{animation:shakeX .35s}
+.bowl-body{position:absolute;left:0;right:0;bottom:0;height:78%;background:linear-gradient(180deg,#d6995f,#9b5a2f);border-radius:6% 6% 50% 50%/12% 12% 100% 100%;box-shadow:inset 0 8px 0 rgba(255,255,255,.18),0 10px 16px rgba(120,60,20,.28)}
+.bowl-body::before{content:'';position:absolute;left:-3%;right:-3%;top:-7%;height:18%;background:linear-gradient(#ebb57f,#d79b63);border-radius:50%}
+.bowl-mound{position:absolute;left:12%;right:12%;bottom:68%;height:62%;background:radial-gradient(circle at 40% 32%,#cf5a33,#8e2c18 72%);border-radius:50% 50% 30% 30%/75% 75% 25% 25%;transform-origin:50% 100%;transform:scale(.55,.08);transition:transform .3s cubic-bezier(.3,1.5,.5,1);z-index:-1}
+.cig-tip{position:absolute;bottom:calc(2% + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);padding:.35em 1.1em;font-weight:700;z-index:3;transition:opacity .5s;white-space:nowrap}
+
+/* L4 Lego */
+.lego{background:linear-gradient(180deg,#ffe8f2,#fff6fa 60%,#ffeef5)}
+.lego-hud{position:absolute;top:calc(70px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);padding:.35em 1.2em;font-weight:800;z-index:5;white-space:nowrap}
+.lego-hud b{color:var(--deep)}
+.lego-tip{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);padding:.35em 1.1em;font-weight:700;z-index:5;transition:opacity .5s;white-space:nowrap}
+.plate{position:absolute;background:#86d395;border-radius:6px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.12)}
+.plate .studs i{background:#86d395}
+.brick{position:absolute;left:0;top:0;background:var(--c);border-radius:5px;box-shadow:inset 0 calc(var(--h)*-.12) 0 rgba(0,0,0,.13),inset 0 3px 0 rgba(255,255,255,.35)}
+.brick.snap{transition:left .12s ease-out}
+.studs{position:absolute;left:7%;right:7%;top:calc(var(--sh)*-1);height:var(--sh);display:flex;justify-content:space-between}
+.studs i{display:block;width:var(--sw);height:100%;background:var(--c);border-radius:4px 4px 0 0;box-shadow:inset 0 3px 0 rgba(255,255,255,.4),inset -3px 0 0 rgba(0,0,0,.08)}
+.lego-ghost{position:absolute;border:3px dashed rgba(255,95,162,.45);border-radius:6px;pointer-events:none}
+
+/* L5 Zilli */
+.zilli{background:linear-gradient(180deg,#ffe6f1,#ffd6e7)}
+.z-win{position:absolute;left:8%;top:16%;width:20vmin;height:24vmin;background:linear-gradient(#cfe9ff,#f2f9ff);border:1.4vmin solid #fff;border-radius:12px;box-shadow:0 6px 16px rgba(150,30,90,.12)}
+.z-win::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:1vmin;margin-left:-.5vmin;background:#fff}
+.z-frame{position:absolute;right:9%;top:15%;padding:1.2vmin 1.8vmin;background:#fff;border-radius:10px;font-size:5vmin;box-shadow:0 6px 16px rgba(150,30,90,.12);transform:rotate(3deg)}
+.z-floor{position:absolute;left:0;right:0;bottom:0;height:28%;background:linear-gradient(#f6c3d9,#eeb0cb)}
+.z-rug{position:absolute;left:50%;bottom:9%;width:74vmin;height:16vmin;margin-left:-37vmin;border-radius:50%;background:repeating-radial-gradient(ellipse,#ff9cc8 0 3vmin,#ffc4dd 3vmin 6vmin);opacity:.7}
+.z-cat-wrap{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);width:min(54vmin,440px);height:min(54vmin,440px);display:grid;place-items:center}
+.z-cat{font-size:min(34vmin,280px);line-height:1;transition:transform .15s;filter:drop-shadow(0 12px 14px rgba(150,40,90,.25));position:relative;z-index:1}
+.z-cat.pet{transform:scale(1.07,.94) rotate(-3deg)}
+.z-name{position:absolute;top:0;left:50%;transform:translateX(-50%);padding:.15em .9em;font-weight:800;z-index:2;white-space:nowrap}
+.z-cushion{position:absolute;bottom:10%;left:12%;width:76%;height:22%;background:radial-gradient(ellipse at 50% 30%,#ffa8cf,#f06aa8);border-radius:50%}
+.z-vase{position:absolute;right:5%;bottom:5%;z-index:1}
+.z-vase .bq{--bqw:min(22vmin,190px)}
+.z-vase.wobble{animation:wobble .4s ease-in-out infinite;transform-origin:50% 100%}
+.z-meter{position:absolute;top:calc(70px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:.35em 1.1em;font-weight:800;z-index:5;white-space:nowrap}
+.z-tip{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);padding:.35em 1.1em;font-weight:700;z-index:5;white-space:nowrap}
+.stamp{position:absolute;left:50%;top:86%;transform:translate(-50%,-50%) rotate(-14deg);border:.25em solid #e0245e;color:#e0245e;font-weight:800;font-size:2.1em;padding:.05em .5em;border-radius:12px;background:rgba(255,255,255,.88);white-space:nowrap;z-index:3;animation:stampIn .45s cubic-bezier(.2,1.6,.4,1)}
+
+/* Bouquet */
+.bq{position:relative;width:var(--bqw,300px);height:calc(var(--bqw,300px)*1.2)}
+.bq-leaf{position:absolute;width:18%;height:24%;transform:translate(-50%,-50%) rotate(var(--r));background:linear-gradient(135deg,#a3e3ad,#4caf6a);border-radius:0 100% 0 100%}
+.bq-p{position:absolute;width:34%;height:28.33%;transform:translate(-50%,-50%) rotate(var(--r))}
+.bq-pi{width:100%;height:100%;animation:bloom .7s cubic-bezier(.2,1.5,.4,1) both;animation-delay:var(--d)}
+.bq-pi svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 4px rgba(180,40,100,.25))}
+.bq-brick{position:absolute;background:var(--c);border-radius:3px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),inset 0 2px 0 rgba(255,255,255,.35)}
+.bq .studs{top:-22%;height:22%}
+.bq .studs i{width:9%;border-radius:2px 2px 0 0;box-shadow:inset 0 2px 0 rgba(255,255,255,.4)}
+
+/* Finale */
+.final{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vmin;padding:calc(66px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+.final>*:not(.rain){position:relative;z-index:1}
+.f-bq .bq{--bqw:min(40vmin,28vh,330px)}
+.msg{background:rgba(255,255,255,.95);border-radius:26px;padding:1.1em 1.4em 1.2em;max-width:min(92vw,520px);width:100%;box-shadow:0 20px 50px rgba(150,30,90,.2);line-height:1.45;max-height:100%;overflow:auto;touch-action:pan-y}
+.msg p{margin:0;opacity:0;transform:translateY(8px);transition:opacity .7s,transform .7s}
+.msg p.on{opacity:1;transform:none}
+.msg p.sp{height:.55em}
+.msg p.hi{font-weight:800;font-size:1.25em;color:var(--deep)}
+.msg p.sig{text-align:right;font-weight:800;color:var(--deep);margin-top:.3em}
+.msg p.ps{font-size:.88em;color:#9a5a7c;margin-top:.4em}
+.final-btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:1em;opacity:0;transition:opacity .6s;pointer-events:none}
+.final-btns.on{opacity:1;pointer-events:auto}
+.final-note{font-size:.88em;color:#a0607f;margin-top:.8em;text-align:center;opacity:0;transition:opacity .6s}
+.final-note.on{opacity:1}
+.track{text-align:left;background:#fff6fa;border-radius:14px;padding:.6em .9em;line-height:1.5}
+.track div{display:flex;justify-content:space-between;gap:12px}
+.track span{color:#a0607f}
+.trk-bar{height:8px;border-radius:4px;background:#ffe1ee;margin:.5em 0 .2em;overflow:hidden}
+.trk-bar i{display:block;height:100%;width:2px;background:#ff5fa2}
+@media (orientation:landscape){.final{flex-direction:row;gap:5vmin}.f-bq .bq{--bqw:min(36vw,52vh,340px)}}
+
+@keyframes popIn{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes boxOpen{40%{transform:scale(1.15) rotate(-6deg)}100%{transform:scale(0) rotate(20deg);opacity:0}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes travel{0%{left:0}50%{left:100%}100%{left:0}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+@keyframes found{0%{transform:scale(1)}45%{transform:scale(1.7) rotate(-12deg)}100%{transform:scale(1.3)}}
+@keyframes ring{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes slotPop{0%{transform:scale(.3)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes alertIn{0%{transform:scale(.3) rotate(-8deg);opacity:0}60%{transform:scale(1.08) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes squish{0%,100%{transform:scale(1,1)}40%{transform:scale(1.12,.86)}}
+@keyframes shakeX{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes wmShake{0%,100%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}}
+@keyframes wobble{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(4deg)}}
+@keyframes stampIn{0%{transform:translate(-50%,-50%) rotate(-14deg) scale(3);opacity:0}100%{transform:translate(-50%,-50%) rotate(-14deg) scale(1);opacity:1}}
+@keyframes spinHint{to{transform:rotate(360deg)}}
+@keyframes bloom{0%{transform:scale(0) rotate(-40deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes butter{0%{left:-8%;top:30%}25%{left:30%;top:22%}50%{left:60%;top:34%}75%{left:85%;top:20%}100%{left:108%;top:30%}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage"></div>
+  <div id="hud" class="hidden">
+    <div id="slots" class="pill"></div>
+    <div id="hud-right">
+      <div id="lb" class="pill"><div class="lb-top"><span>💘 Lovebombing</span><b id="lbv">%0</b></div><div class="lb-bar"><i id="lbi"></i></div></div>
+      <button id="mute" class="pill" aria-label="Ses">🔊</button>
+    </div>
+  </div>
+  <div id="fx"></div>
+  <div id="toast"></div>
+  <div id="overlay"></div>
+</div>
+<script>
+(() => {
+'use strict';
+
+// ===== Kişisel metinler: buradan değiştirebilirsin =====
+const CONFIG = {
+  to: 'Sude',
+  from: 'Anıl',
+  fromCity: 'Nevşehir',
+  toCity: 'Zonguldak',
+  sender: "Nevşehir'den biri 😏",
+  km: 500,
+  finalMessage: [
+    'Sude,',
+    '',
+    'Şakayık buketini "çok pahalı" deyip almamıştım ya...',
+    'Mühendis olarak çözümü buldum: kendim yaptım. 🌸',
+    '',
+    'Solmuyor, su istemiyor, Zilli onaylı.',
+    'Aramızda ~500 km var ama yine de sana ulaştı.',
+    '',
+    'Bir de şunu söylemem lazım:',
+    'seninle konuşmak günümün en güzel kısmı.',
+    '',
+    '(Evet, bu da lovebombing. Bismillah de. 😄)',
+    '— Anıl',
+    'P.S. Çamaşır makinesini de yaptım. Artık sorma. 😌',
+  ],
+  cargoExtra: 'Ya da daha hızlı bir yöntem var: ben getiririm. 🙂',
+  finalNote: "Bitirince bana sadece \"bismillah\" yazman yeterli 😄",
+};
+
+const INTROS = [
+  {icon:'🧺', title:'Bölüm 1 · Çamaşır Makinesi', html:'"Çamaşır makinesi yaptın mı?" diye sorup duruyordun.<br><b>Yaptım.</b> 😌<br><br>Pembe kıyafetlerini makineye at, sonra parmağınla tamburu çevir.<br><small>(Renkli-beyaz ayırmaya gerek yok, her şey zaten pembe.)</small>'},
+  {icon:'🐌', title:'Bölüm 2 · Yurt Bahçesi', html:'Yurtta sürekli salyangoz keşfettiğini duydum.<br>Bahçeye <b>6 salyangoz</b> saklandı. Hepsini bul!'},
+  {icon:'🌯', title:'Bölüm 3 · Diyarbakır Çiğköftesi', html:'Kaseyi parmağınla sağa sola kaydır, malzemeleri yakala.<br><b>15 malzeme</b> topla.<br><small>Dikkat: ananas, çikolata, brokoli ve çilek çiğköfteye girmez. 🚫</small>'},
+  {icon:'🧱', title:'Bölüm 4 · Lego Vazo', html:'Buket var ama vazo yok.<br>Neyse ki bir Lego ustası tanıyorum. 😌<br><br>Kayan tuğla tam ortaya gelince <b>dokun</b>. 8 tuğla, 1 vazo.'},
+  {icon:'🐱', title:'Bölüm 5 · Zilli Onayı', html:'Buketin son onayı Zilli\'de.<br>Ama Zilli erkek ve biraz kıskanç: buket ona gelmedi diye trip atıyor. 😾<br><br>Parmağını üstünde gezdirerek onu <b>sev</b>, gönlünü al.'},
+];
+
+const RESULTS = [
+  {icon:'✅', title:'"Yaptın mı?" → YAPTIM.', html:'Anıl Mühendislik ÇM-1, ilk müşterisine teslim edildi.<br>Bonus: tamburdan şakayık çıktı. Mühendislik bazen böyle.', comp:'Bu arada çamaşır yıkarken bile çok tatlısın.'},
+  {icon:'🏅', title:'Salyangoz Keşif Uzmanı', html:'6/6! Bu bahçede senden saklanabilecek salyangoz yok.<br><small>Kargo Kemal buketi getiremeyeceğini öğrenince biraz üzüldü.</small>', comp:'O dikkatli gözlere bayılıyorum. Bir de çok güzeller, onu da söyleyeyim.'},
+  {icon:'🌯', title:'Diyarbakır usulü hazır!', html:'Bol isotlu, bol limonlu, ananassız. 🍋🌶️<br><small>Zilli de istedi, vermedik. Acı.</small>', comp:'Diyarbakır çiğköftesinden bile güzelsin. Ciddi ciddi karşılaştırdım.'},
+  {icon:'🏆', title:'Lego Ustası Sude', html:'8 tuğla, sıfır talimat kitapçığı.<br>Vazo hazır, şakayıklar yerleşebilir. 🌸', comp:'Lego yaparken dünyanın en tatlı insanı olduğuna eminim. Kanıtım yok ama eminim.'},
+  {icon:'🐾', title:'ZİLLİ ONAYLI', html:'Kalite kontrol geçildi. 😻<br><small>Erkek kedi onayı kolay alınmaz, tebrikler.</small>', comp:'Zilli bile dayanamadı. Onu anlıyorum.'},
+];
+
+const SNAILS = [
+  {n:'Turbo', d:'hızı 0,001 km/sa 🏎️'},
+  {n:'Hasan', d:'evini sırtında taşıyor, kira yok 🏠'},
+  {n:'Mimar Sinan', d:'kabuğunu kendi çizdi 🌀'},
+  {n:'Gece Kuşu', d:'sadece yağmurdan sonra çıkar 🌧️'},
+  {n:'Yurt Müdürü', d:'giriş saati 23:00, unutma ⏰'},
+  {n:'Kargo Kemal', d:'aslında buketi o getirecekti... 📦'},
+];
+
+// ===== yardımcılar =====
+const $ = (s, r = document) => r.querySelector(s);
+const stage = $('#stage'), fx = $('#fx'), overlay = $('#overlay');
+const state = { peonies: 0, love: 0 };
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+
+let cleanups = [];
+function onCleanup(f) { cleanups.push(f); }
+function clearStage() { cleanups.splice(0).forEach(f => { try { f(); } catch (e) {} }); stage.innerHTML = ''; Sound.purr(false); }
+function later(f, ms) { const id = setTimeout(f, ms); onCleanup(() => clearTimeout(id)); return id; }
+function every(f, ms) { const id = setInterval(f, ms); onCleanup(() => clearInterval(id)); return id; }
+function listen(t, ev, fn, opt) { t.addEventListener(ev, fn, opt); onCleanup(() => t.removeEventListener(ev, fn, opt)); }
+function loop(f) {
+  let id, last = performance.now(), alive = true;
+  const tick = t => { if (!alive) return; const dt = Math.min(.05, Math.max(0, (t - last) / 1000)); last = t; if (f(dt, t) === false) { alive = false; return; } id = requestAnimationFrame(tick); };
+  id = requestAnimationFrame(tick);
+  onCleanup(() => { alive = false; cancelAnimationFrame(id); });
+}
+
+// ===== ses (dosya yok, hepsi sentez) =====
+const Sound = {
+  ctx: null, on: true, pn: null,
+  unlock() {
+    try {
+      if (!this.ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+        this.ctx = new AC();
+        const b = this.ctx.createBuffer(1, 1, 22050), s = this.ctx.createBufferSource();
+        s.buffer = b; s.connect(this.ctx.destination); s.start(0);
+      }
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+    } catch (e) {}
+  },
+  t(freq, dur = .12, o = {}) {
+    if (!this.on || !this.ctx) return;
+    try {
+      const c = this.ctx, t0 = c.currentTime + (o.delay || 0);
+      const osc = c.createOscillator(), g = c.createGain();
+      osc.type = o.type || 'sine';
+      osc.frequency.setValueAtTime(freq, t0);
+      if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t0 + dur);
+      g.gain.setValueAtTime(.0001, t0);
+      g.gain.exponentialRampToValueAtTime(o.vol || .16, t0 + .012);
+      g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+      osc.connect(g); g.connect(c.destination);
+      osc.start(t0); osc.stop(t0 + dur + .05);
+    } catch (e) {}
+  },
+  pop(p = 1) { this.t(480 * p, .13, { type: 'triangle', to: 900 * p, vol: .18 }); },
+  click() { this.t(1500, .04, { type: 'square', vol: .06 }); this.t(800, .05, { type: 'square', vol: .05, delay: .03 }); },
+  bad() { this.t(320, .28, { type: 'sawtooth', vol: .07, to: 110 }); },
+  bip() { [0, .2, .4].forEach(d => this.t(1046, .13, { type: 'square', vol: .06, delay: d })); },
+  win() { [523, 659, 784, 1046].forEach((f, i) => this.t(f, .24, { type: 'triangle', vol: .15, delay: i * .1 })); },
+  alarm() { [0, .18, .36, .54].forEach((d, i) => this.t(i % 2 ? 660 : 880, .15, { type: 'square', vol: .045, delay: d })); },
+  purr(on) {
+    if (!this.ctx) return;
+    if (on && this.on) {
+      if (this.pn) return;
+      try {
+        const c = this.ctx, o = c.createOscillator(), f = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+        o.type = 'sawtooth'; o.frequency.value = 52; f.type = 'lowpass'; f.frequency.value = 200;
+        g.gain.value = .0001; g.gain.linearRampToValueAtTime(.07, c.currentTime + .15);
+        lfo.frequency.value = 23; lg.gain.value = .06; lfo.connect(lg); lg.connect(g.gain);
+        o.connect(f); f.connect(g); g.connect(c.destination); o.start(); lfo.start();
+        this.pn = { o, lfo, g };
+      } catch (e) {}
+    } else if (this.pn) {
+      const { o, lfo, g } = this.pn, c = this.ctx; this.pn = null;
+      try { g.gain.cancelScheduledValues(c.currentTime); g.gain.setValueAtTime(g.gain.value, c.currentTime); g.gain.linearRampToValueAtTime(0, c.currentTime + .15); o.stop(c.currentTime + .2); lfo.stop(c.currentTime + .2); } catch (e) {}
+    }
+  },
+};
+['pointerdown', 'touchend', 'click'].forEach(ev => document.addEventListener(ev, () => Sound.unlock(), { passive: true }));
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('touchmove', e => { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+$('#mute').addEventListener('click', () => { Sound.on = !Sound.on; $('#mute').textContent = Sound.on ? '🔊' : '🔇'; if (!Sound.on) Sound.purr(false); });
+
+// ===== çizimler =====
+const PEONY_COLORS = [
+  ['#ffe6f1', '#ff9cc8', '#ef5d9c'],
+  ['#fff1f6', '#ffb3d1', '#f2779f'],
+  ['#ffe9f0', '#ff8fb4', '#e44f86'],
+  ['#fff5f8', '#ffc2d9', '#f58bb3'],
+  ['#ffe1eb', '#ff86b0', '#d9437a'],
+];
+let pid = 0;
+function peonySVG(v = 0) {
+  const [c1, c2, c3] = PEONY_COLORS[v % PEONY_COLORS.length];
+  const id = 'pg' + (pid++);
+  const petal = (r, w) => `M0 0 C ${-w} ${-r * .2} ${-w * 1.15} ${-r * .85} ${-w * .35} ${-r} Q 0 ${-r * 1.08} ${w * .35} ${-r} C ${w * 1.15} ${-r * .85} ${w} ${-r * .2} 0 0Z`;
+  const ring = (n, r, w, off, fill) => { let s = ''; for (let i = 0; i < n; i++) s += `<path d="${petal(r, w)}" transform="rotate(${off + i * 360 / n})" fill="${fill}" stroke="${c3}" stroke-opacity=".35" stroke-width=".8"/>`; return s; };
+  return `<svg viewBox="-52 -52 104 104" xmlns="http://www.w3.org/2000/svg"><defs>` +
+    `<radialGradient id="${id}" cx="0" cy="0" r="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${c3}"/><stop offset=".55" stop-color="${c2}"/><stop offset="1" stop-color="${c1}"/></radialGradient>` +
+    `<radialGradient id="${id}b" cx="0" cy="0" r="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${c3}"/><stop offset="1" stop-color="${c2}"/></radialGradient></defs>` +
+    ring(9, 48, 30, 0, `url(#${id})`) + ring(8, 38, 24, 22, `url(#${id})`) + ring(7, 28, 18, 8, `url(#${id})`) +
+    ring(6, 19, 13, 30, `url(#${id}b)`) + ring(5, 11, 8, 12, `url(#${id}b)`) +
+    `<circle r="4" fill="${c3}" opacity=".6"/></svg>`;
+}
+
+const ST = 'stroke="#b8336f" stroke-width="3" stroke-linejoin="round"';
+const CLOTHES = {
+  tshirt: c => `<svg viewBox="0 0 100 100"><path d="M32 14 L43 9 Q50 19 57 9 L68 14 L90 30 L80 46 L71 40 L71 90 L29 90 L29 40 L20 46 L10 30 Z" fill="${c}" ${ST}/><path d="M42 52 Q50 44 58 52 Q50 64 50 64 Q50 64 42 52Z" fill="#fff" opacity=".7"/></svg>`,
+  dress: c => `<svg viewBox="0 0 100 100"><path d="M38 6 L42 6 L44 22 L56 22 L58 6 L62 6 L64 30 Q60 38 62 42 L86 92 L14 92 L38 42 Q40 38 36 30 Z" fill="${c}" ${ST}/><path d="M38 42 Q50 48 62 42" fill="none" ${ST}/></svg>`,
+  sock: c => `<svg viewBox="0 0 100 100"><path d="M34 8 L62 8 L62 56 Q62 68 74 71 L84 74 Q94 78 90 88 Q87 94 78 94 L50 94 Q34 94 34 76 Z" fill="${c}" ${ST}/><path d="M35 10 L61 10 L61 20 L35 20Z" fill="#fff" opacity=".65"/></svg>`,
+  skirt: c => `<svg viewBox="0 0 100 100"><path d="M30 24 L70 24 L90 84 Q50 94 10 84 Z" fill="${c}" ${ST}/><rect x="30" y="15" width="40" height="10" rx="3" fill="${c}" ${ST}/><path d="M43 28 L36 86 M57 28 L64 86" stroke="#b8336f" stroke-width="2" opacity=".45"/></svg>`,
+  hoodie: c => `<svg viewBox="0 0 100 100"><path d="M36 10 Q50 2 64 10 L70 16 L90 34 L82 48 L73 42 L73 92 L27 92 L27 42 L18 48 L10 34 L30 16 Z" fill="${c}" ${ST}/><path d="M38 12 Q50 30 62 12" fill="none" ${ST}/><rect x="38" y="62" width="24" height="14" rx="4" fill="none" stroke="#b8336f" stroke-width="2.5"/></svg>`,
+};
+
+const VASE_W = [.78, .92, 1, 1, .9, .76, .6, .72];
+const VASE_C = ['#ff8cc0', '#ffc0db', '#ff6fa8', '#ffd6e8', '#f75a9b', '#ffb3d4', '#ff86b8', '#ffa6cc'];
+
+function bouquet(count) {
+  const b = el('div', 'bq');
+  const UW = 42, BHp = 5.95;
+  let h = '';
+  [[22, 44, -40], [78, 44, 40], [30, 27, -18], [70, 27, 18], [50, 33, 0], [14, 56, -62], [86, 56, 62]]
+    .forEach(([x, y, r]) => h += `<i class="bq-leaf" style="left:${x}%;top:${y}%;--r:${r}deg"></i>`);
+  const POS = [[50, 19], [27, 32], [73, 32], [38, 45], [62, 45]];
+  for (let i = 0; i < count; i++) {
+    const [x, y] = POS[i];
+    h += `<div class="bq-p" style="left:${x}%;top:${y}%;--r:${Math.round(rnd(-25, 25))}deg"><div class="bq-pi" style="--d:${i * .18}s">${peonySVG(i)}</div></div>`;
+  }
+  VASE_W.forEach((w, i) => {
+    const ww = UW * w, n = Math.max(2, Math.round(w * 5));
+    h += `<div class="bq-brick" style="--c:${VASE_C[i]};left:${50 - ww / 2}%;width:${ww}%;bottom:${i * BHp}%;height:${BHp}%"><div class="studs">${'<i></i>'.repeat(n)}</div></div>`;
+  });
+  b.innerHTML = h;
+  return b;
+}
+
+// ===== efektler =====
+const PETAL_COLORS = ['#ff9cc8', '#ffb8d6', '#ff7eb6', '#ffd1e5', '#f76aa6', '#fff0f6'];
+function petal(x, y, dx, dy, dur, size) {
+  const p = el('i', 'petal');
+  p.style.cssText = `left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size * .8}px;background:${pick(PETAL_COLORS)}`;
+  fx.append(p);
+  p.animate([{ transform: 'translate(0,0) rotate(0deg)', opacity: 1 }, { transform: `translate(${dx}px,${dy}px) rotate(${rnd(-540, 540)}deg)`, opacity: 0 }], { duration: dur, easing: 'cubic-bezier(.15,.7,.4,1)' }).onfinish = () => p.remove();
+}
+function burst(x, y, n = 26) {
+  for (let i = 0; i < n; i++) { const a = rnd(0, Math.PI * 2), d = rnd(60, 220); petal(x, y, Math.cos(a) * d, Math.sin(a) * d + rnd(60, 170), rnd(900, 1700), rnd(8, 17)); }
+}
+function rain(container) {
+  const spawn = () => {
+    if (container.childElementCount > 40) return;
+    const p = el('i', 'rp'), s = rnd(8, 16), H = container.clientHeight || innerHeight;
+    p.style.cssText = `left:${rnd(0, 100)}%;width:${s}px;height:${s * .8}px;background:${pick(PETAL_COLORS)}`;
+    container.append(p);
+    p.animate([{ transform: 'translate(0,-30px) rotate(0deg)' }, { transform: `translate(${rnd(-90, 90)}px,${H + 40}px) rotate(${rnd(-420, 420)}deg)` }], { duration: rnd(6000, 10000), easing: 'linear' }).onfinish = () => p.remove();
+  };
+  for (let i = 0; i < 5; i++) spawn();
+  every(spawn, 380);
+}
+function floatText(x, y, txt, cls = '') {
+  const t = el('div', 'float ' + cls, txt);
+  t.style.left = x + 'px'; t.style.top = y + 'px';
+  fx.append(t);
+  t.animate([
+    { transform: 'translate(-50%,-50%) scale(.6)', opacity: 0 },
+    { transform: 'translate(-50%,-110%) scale(1)', opacity: 1, offset: .2 },
+    { transform: 'translate(-50%,-260%) scale(1)', opacity: 0 },
+  ], { duration: 1300, easing: 'ease-out' }).onfinish = () => t.remove();
+}
+function speech(x, y, html) {
+  const b = el('div', 'speech', html);
+  fx.append(b);
+  const w = b.offsetWidth;
+  b.style.left = Math.max(w / 2 + 8, Math.min(innerWidth - w / 2 - 8, x)) + 'px';
+  b.style.top = y + 'px';
+  b.animate([{ opacity: 0, transform: 'translate(-50%,-80%) scale(.7)' }, { opacity: 1, transform: 'translate(-50%,-112%) scale(1)' }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+  setTimeout(() => { b.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' }).onfinish = () => b.remove(); }, 2600);
+}
+let toastT;
+function toast(m) { const t = $('#toast'); t.innerHTML = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1900); }
+
+// ===== HUD =====
+function renderSlots(popIdx = -1) {
+  const s = $('#slots'); s.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = el('div', 'slot' + (i < state.peonies ? ' full' : '') + (i === popIdx ? ' pop' : ''));
+    if (i < state.peonies) d.innerHTML = peonySVG(i);
+    s.append(d);
+  }
+}
+function setLove(v) { state.love = v; $('#lbv').textContent = '%' + v; $('#lbi').style.width = v + '%'; }
+function setHud(show) { $('#hud').classList.toggle('hidden', !show); }
+
+function modal({ icon = '', title = '', html = '', btn = 'Devam', onBtn, cls = '' }) {
+  const back = el('div', 'modal-back'), m = el('div', 'modal ' + cls);
+  m.innerHTML = `${icon ? `<div class="m-icon">${icon}</div>` : ''}${title ? `<h2>${title}</h2>` : ''}<div class="m-body">${html}</div><div class="m-extra"></div><div class="m-btns"><button class="btn">${btn}</button></div>`;
+  back.append(m); overlay.append(back);
+  const b = $('.btn', m); let closed = false;
+  b.addEventListener('click', () => {
+    if (closed) return; closed = true; Sound.click();
+    back.classList.add('out'); setTimeout(() => back.remove(), 260);
+    onBtn && onBtn();
+  });
+  return { back, m, btn: b, btns: $('.m-btns', m), extra: $('.m-extra', m) };
+}
+
+function earnPeony(rect, cb) {
+  const idx = state.peonies, slot = $('#slots').children[idx];
+  const size = Math.min(innerWidth, innerHeight) * .3;
+  const cx = rect ? rect.left + rect.width / 2 : innerWidth / 2, cy = rect ? rect.top + rect.height / 2 : innerHeight / 2;
+  const p = el('div', 'big-peony', peonySVG(idx));
+  p.style.cssText = `width:${size}px;height:${size}px;left:${cx - size / 2}px;top:${cy - size / 2}px`;
+  fx.append(p);
+  burst(cx, cy, 30); Sound.win();
+  p.animate([{ transform: 'scale(0) rotate(-90deg)' }, { transform: 'scale(1.15) rotate(10deg)', offset: .6 }, { transform: 'scale(1) rotate(0)' }], { duration: 700, easing: 'ease-out', fill: 'forwards' });
+  setTimeout(() => floatText(cx, cy - size * .55, '+1 şakayık 🌸', 'big'), 300);
+  setTimeout(() => {
+    const sr = slot.getBoundingClientRect();
+    const dx = sr.left + sr.width / 2 - cx, dy = sr.top + sr.height / 2 - cy, sc = sr.width / size;
+    p.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx}px,${dy}px) scale(${sc})` }], { duration: 750, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }).onfinish = () => {
+      p.remove(); state.peonies++; renderSlots(idx); Sound.pop(1.5); cb && cb();
+    };
+  }, 1450);
+}
+
+// ===== akış =====
+const LEVELS = [lvlWash, lvlSnail, lvlCig, lvlLego, lvlZilli];
+function playLevel(i) {
+  clearStage(); setHud(true);
+  const start = LEVELS[i](rect => afterLevel(i, rect));
+  modal({ ...INTROS[i], btn: 'Başla ▶', onBtn: () => start && start() });
+}
+function afterLevel(i, rect) {
+  earnPeony(rect, () => resultModal(i, () => (i + 1 < LEVELS.length ? playLevel(i + 1) : finale())));
+}
+function resultModal(i, next) {
+  const r = RESULTS[i], last = i === LEVELS.length - 1;
+  const md = modal({ icon: r.icon, title: r.title, html: `${r.html}<div class="compliment">“${r.comp}”</div>`, btn: 'Bismillah 🤲', onBtn: next });
+  md.btns.style.visibility = 'hidden';
+  setTimeout(() => {
+    const v = (i + 1) * 20;
+    md.extra.innerHTML = `<div class="lb-alert">⚠️ ${last ? 'LOVEBOMBING %100 · SİSTEM AŞIRI YÜKLENDİ' : 'LOVEBOMBING TESPİT EDİLDİ'}<small>Seviye: %${v}</small></div>`;
+    Sound.alarm(); setLove(v);
+    md.btns.style.visibility = 'visible'; md.btn.classList.add('appear');
+  }, 1500);
+}
+
+// ===== giriş =====
+function intro() {
+  clearStage(); setHud(false);
+  const L = el('div', 'lvl intro');
+  L.innerHTML = `<div class="rain"></div>
+    <div class="route pill">📍 ${CONFIG.fromCity}<i class="dots"></i>📍 ${CONFIG.toCity}</div>
+    <button class="box"><div class="box-emoji">📦</div><div class="label">
+      <div><b>Alıcı:</b> ${CONFIG.to} (${CONFIG.toCity})</div>
+      <div><b>Gönderen:</b> ${CONFIG.sender}</div>
+      <div><b>İçerik:</b> 1 adet şakayık buketi</div>
+      <span class="lstamp">ÇOK PAHALI DEĞİL ✓</span></div></button>
+    <div class="intro-tip">Paketi açmak için dokun 👆</div>
+    <div class="intro-sound">🔊 Sesi açarsan daha eğlenceli</div>`;
+  stage.append(L);
+  rain($('.rain', L));
+  const box = $('.box', L);
+  box.addEventListener('click', () => {
+    if (box.dataset.open) return; box.dataset.open = '1';
+    Sound.unlock(); Sound.win();
+    const r = box.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height * .35, 44);
+    box.classList.add('opened');
+    ['.intro-tip', '.intro-sound', '.route'].forEach(s => $(s, L).style.opacity = 0);
+    later(() => {
+      ['.box', '.intro-tip', '.intro-sound', '.route'].forEach(s => $(s, L) && $(s, L).remove());
+      const c = el('div', 'card', `<div class="card-top">🌸</div><h1>Merhaba ${CONFIG.to}!</h1>
+        <p>Hani benden <b>şakayık buketi</b> istemiştin ya...<br>"Çok pahalı" deyip almamıştım. 😌</p>
+        <p>Ama ben mühendisim, çözümü buldum:<br><b>buketi burada birlikte toplayacağız.</b></p>
+        <p class="big">5 bölüm = 5 şakayık 🌸</p>
+        <button class="btn">Hadi başlayalım</button>`);
+      L.append(c);
+      $('.btn', c).addEventListener('click', () => { Sound.click(); playLevel(0); });
+    }, 560);
+  });
+}
+
+// ===== Bölüm 1: çamaşır makinesi =====
+function lvlWash(done) {
+  const L = el('div', 'lvl wash');
+  L.innerHTML = `
+    <div class="wm">
+      <div class="wm-panel">
+        <div class="wm-knob"><i></i></div>
+        <div class="wm-lcd"><small>SUDE-3000 · Program: Aşırı Pembe</small><b class="lcd">KIYAFET BEKLENİYOR</b></div>
+        <div class="wm-leds"><i></i><i></i><i></i></div>
+      </div>
+      <div class="wm-brand">${CONFIG.from.toLocaleUpperCase('tr')} MÜHENDİSLİK · ÇM-1</div>
+      <div class="wm-door">
+        <div class="wm-glass"><div class="wm-drum"></div><div class="wm-water"></div><div class="wm-bubbles"></div></div>
+        <div class="wm-lid"></div>
+        <div class="spin-hint">↻</div>
+      </div>
+    </div>
+    <div class="basket-wrap">
+      <div class="tip pill">Kıyafetlere dokun, makineye atılsın 👆</div>
+      <div class="basket"></div>
+    </div>`;
+  stage.append(L);
+  const wm = $('.wm', L), drum = $('.wm-drum', L), glass = $('.wm-glass', L), lid = $('.wm-lid', L), lcd = $('.lcd', L), tip = $('.tip', L),
+    basket = $('.basket', L), knob = $('.wm-knob', L), leds = [...L.querySelectorAll('.wm-leds i')], water = $('.wm-water', L),
+    bubbles = $('.wm-bubbles', L), hint = $('.spin-hint', L), door = $('.wm-door', L);
+  const kinds = ['tshirt', 'dress', 'sock', 'skirt', 'hoodie'], cols = ['#ff8cc0', '#ffb6d5', '#ff6fa9', '#f9a8c9', '#ff94b8'];
+  let inside = 0, phase = 'load';
+
+  kinds.forEach((k, i) => {
+    const b = el('button', 'cloth', CLOTHES[k](cols[i]));
+    b.addEventListener('click', () => {
+      if (phase !== 'load' || b.classList.contains('gone')) return;
+      b.classList.add('gone'); Sound.pop(1 + inside * .1);
+      const a = b.getBoundingClientRect(), g = glass.getBoundingClientRect();
+      const c = el('div', 'cloth-fly', b.innerHTML);
+      c.style.cssText = `left:${a.left}px;top:${a.top}px;width:${a.width}px;height:${a.height}px`;
+      fx.append(c);
+      const dx = g.left + g.width / 2 - (a.left + a.width / 2), dy = g.top + g.height / 2 - (a.top + a.height / 2);
+      c.animate([
+        { transform: 'translate(0,0) rotate(0deg) scale(1)' },
+        { transform: `translate(${dx * .5}px,${dy * .5 - Math.min(160, innerHeight * .15)}px) rotate(200deg) scale(.85)` },
+        { transform: `translate(${dx}px,${dy}px) rotate(380deg) scale(.45)` },
+      ], { duration: 650, easing: 'ease-in-out' }).onfinish = () => { c.remove(); addInside(k, cols[i]); };
+    });
+    basket.append(b);
+  });
+
+  function addInside(k, c) {
+    const n = el('div', 'in', CLOTHES[k](c)), a = inside * 1.257 + rnd(-.3, .3), r = rnd(16, 24);
+    n.style.left = (50 + Math.cos(a) * r) + '%'; n.style.top = (50 + Math.sin(a) * r) + '%';
+    n.style.setProperty('--r', Math.round(rnd(0, 360)) + 'deg');
+    drum.append(n); inside++;
+    lcd.textContent = `YÜKLENDİ ${inside}/5`;
+    Sound.pop(.8);
+    if (inside === 5) {
+      basket.style.opacity = 0; basket.style.transform = 'scale(.8)';
+      later(() => {
+        lid.classList.add('closed'); Sound.click(); lcd.textContent = 'KAPAK KİLİTLENDİ 🔒';
+        later(() => {
+          phase = 'spin'; wm.classList.add('running'); hint.classList.add('on'); lcd.textContent = 'YIKAMA %0';
+          tip.innerHTML = 'Şimdi parmağınla tamburu <b>daire çizerek çevir</b> 🔄<br><small>(ya da cama hızlı hızlı dokun)</small>';
+        }, 650);
+      }, 350);
+    }
+  }
+
+  let rot = 0, vel = 0, prog = 0, drag = false, lastA = 0, lastT = 0, center = { x: 0, y: 0 }, bubT = 0, lastPct = -1;
+  const GOAL = Math.PI * 2 * 5;
+  const ang = e => Math.atan2(e.clientY - center.y, e.clientX - center.x);
+  listen(door, 'pointerdown', e => {
+    if (phase !== 'spin') return;
+    const r = glass.getBoundingClientRect(); center = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    drag = true; lastA = ang(e); lastT = performance.now();
+    try { door.setPointerCapture(e.pointerId); } catch (_) {}
+    vel += (vel >= 0 ? 1 : -1) * 3.4; hint.classList.remove('on');
+  });
+  listen(door, 'pointermove', e => {
+    if (!drag || phase !== 'spin') return;
+    const a = ang(e); let d = a - lastA;
+    if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2;
+    const now = performance.now(), dt = Math.max(.008, (now - lastT) / 1000);
+    lastA = a; lastT = now; rot += d; prog += Math.abs(d);
+    vel = vel * .5 + Math.max(-30, Math.min(30, d / dt)) * .5;
+  });
+  const up = () => { drag = false; };
+  listen(door, 'pointerup', up); listen(door, 'pointercancel', up);
+
+  function bubble() {
+    const b = el('i', 'bub'), s = rnd(5, 14), gh = glass.clientHeight;
+    b.style.cssText = `left:${rnd(10, 85)}%;width:${s}px;height:${s}px`;
+    bubbles.append(b);
+    b.animate([{ transform: 'translateY(0)', opacity: .9 }, { transform: `translateY(${-gh * .75}px)`, opacity: 0 }], { duration: 1400, easing: 'ease-out' }).onfinish = () => b.remove();
+  }
+
+  loop((dt, t) => {
+    if (phase !== 'spin' && phase !== 'done') return;
+    if (!drag) { rot += vel * dt; if (phase === 'spin') prog += Math.abs(vel * dt); vel *= Math.pow(phase === 'done' ? .12 : .4, dt); }
+    drum.style.transform = `rotate(${rot}rad)`;
+    const sp = Math.min(1, Math.abs(vel) / 14);
+    water.style.transform = `rotate(${Math.sin(t / 180) * sp * 14}deg) translateY(${(1 - sp) * 8}%)`;
+    knob.style.transform = `rotate(${Math.min(1, prog / GOAL) * 300}deg)`;
+    wm.classList.toggle('shake', sp > .75 && phase === 'spin');
+    if (phase === 'spin') {
+      bubT += dt * (.6 + sp * 7); if (bubT > 1) { bubT = 0; bubble(); }
+      const pct = Math.min(100, Math.floor(prog / GOAL * 100));
+      if (pct !== lastPct) { lastPct = pct; lcd.textContent = `YIKAMA %${pct}`; leds.forEach((l, j) => l.classList.toggle('on', pct >= (j + 1) * 30)); }
+      if (prog >= GOAL) finish();
+    }
+  });
+
+  function finish() {
+    phase = 'done'; wm.classList.remove('shake');
+    lcd.textContent = 'BİTTİ ✓ TERTEMİZ'; Sound.bip(); leds.forEach(l => l.classList.add('on'));
+    tip.innerHTML = 'Bip bip bip! 🎵';
+    later(() => { lid.classList.remove('closed'); Sound.click(); wm.classList.remove('running'); }, 1100);
+    later(() => { tip.innerHTML = 'Tamburdan bir şey çıktı?! 👀'; done(glass.getBoundingClientRect()); }, 1800);
+  }
+  return null;
+}
+
+// ===== Bölüm 2: salyangozlar =====
+function lvlSnail(done) {
+  const L = el('div', 'lvl garden');
+  L.innerHTML = `<div class="g-sun"></div>
+    <div class="yurt"><div class="yurt-roof"></div><div class="yurt-sign">🏠 YURT</div><div class="yurt-wins">${'<i></i>'.repeat(8)}</div><div class="yurt-door"></div></div>
+    <div class="ground"></div><div class="butterfly">🦋</div>
+    <div class="counter pill">🐌 Bulunan: <b>0</b>/6</div>`;
+  stage.append(L);
+  // [emoji, x%, y%, boyut vmin, örtü mü]
+  const DECOR = [
+    ['🌳', 6, 50, 22], ['🌳', 94, 48, 20], ['🌲', 82, 45, 13],
+    ['🌿', 15, 74, 15, 1], ['🪨', 88, 66, 12, 1], ['🍃', 47, 88, 11, 1], ['🍄', 79, 83, 10], ['🪴', 56, 41, 7, 1],
+    ['🌷', 7, 90, 8], ['🌼', 63, 70, 7], ['🌿', 70, 92, 11], ['🪨', 33, 69, 9], ['🍂', 25, 92, 7], ['🌱', 93, 88, 8],
+    ['🐞', 60, 80, 4], ['🌸', 39, 78, 6], ['🌱', 22, 63, 6],
+  ];
+  DECOR.forEach(([e, x, y, s, c]) => {
+    const d = el('div', 'deco' + (c ? ' cover' : ''), e);
+    d.style.left = x + '%'; d.style.top = y + '%'; d.style.setProperty('--s', s + 'vmin');
+    L.append(d);
+  });
+  // [x%, y%, boyut vmin, yön, dönüş]
+  const SPOTS = [[29, 46, 5, 1, 80], [58.5, 39.5, 4.6, -1, 0], [19.5, 77, 5.6, -1, 0], [80, 77.5, 4.8, 1, 0], [44.5, 89, 5.6, 1, 0], [84, 67, 5.6, 1, 0]];
+  let found = 0, lastFind = 0, started = false;
+  const snails = SPOTS.map(([x, y, s, f, r]) => {
+    const b = el('button', 'snail', `<span class="s-flip" style="--fx:${f};--rot:${r}deg"><span class="s-anim">🐌</span></span>`);
+    b.style.left = x + '%'; b.style.top = y + '%'; b.style.setProperty('--s', s + 'vmin');
+    b.addEventListener('pointerdown', e => { e.stopPropagation(); hit(b); });
+    L.append(b);
+    return b;
+  });
+  const counter = $('.counter b', L);
+  function hit(b) {
+    if (!started || b.classList.contains('found')) return;
+    b.classList.add('found'); b.classList.remove('hint');
+    const info = SNAILS[found]; found++; lastFind = performance.now();
+    Sound.pop(1 + found * .12);
+    b.insertAdjacentHTML('beforeend', '<span class="bow">🎀</span>');
+    const r = b.getBoundingClientRect();
+    speech(r.left + r.width / 2, r.top + r.height * .2, `<b>${info.n}</b> · ${info.d}`);
+    burst(r.left + r.width / 2, r.top + r.height / 2, 8);
+    counter.textContent = found;
+    if (found === SNAILS.length) later(() => done(r), 1700);
+  }
+  every(() => {
+    if (!started || found >= SNAILS.length) return;
+    if (performance.now() - lastFind > 15000) {
+      const s = snails.find(s => !s.classList.contains('found') && !s.classList.contains('hint'));
+      if (s) { s.classList.add('hint'); toast('İpucu: kıpırdayana bak 👀'); }
+      lastFind = performance.now();
+    }
+  }, 1000);
+  return () => { started = true; lastFind = performance.now(); };
+}
+
+// ===== Bölüm 3: çiğköfte =====
+function lvlCig(done) {
+  const L = el('div', 'lvl cig');
+  L.innerHTML = `<div class="cig-table"></div>
+    <div class="cig-hud pill"><span>🌯</span><div class="bar"><i></i></div><b>0/15</b></div>
+    <div class="bowl"><div class="bowl-in"><div class="bowl-mound"></div><div class="bowl-body"></div></div></div>
+    <div class="cig-tip pill">Kaseyi parmağınla sağa sola kaydır 👆</div>`;
+  stage.append(L);
+  const bowl = $('.bowl', L), bin = $('.bowl-in', L), mound = $('.bowl-mound', L), bar = $('.cig-hud i', L), sc = $('.cig-hud b', L), tipE = $('.cig-tip', L);
+  const GOOD = [['🌶️', 'isot 🔥'], ['🌾', 'bulgur'], ['🍅', 'domates'], ['🧅', 'soğan'], ['🍋', 'limon'], ['🥬', 'marul'], ['🌿', 'maydanoz']];
+  const BAD = [['🍍', 'Ananaslı çiğköfte mi?! 😱'], ['🍫', 'Çikolatalı çiğköfte... Diyarbakır duymasın 🙊'], ['🥦', 'Brokoli? Burası diyet sayfası değil 😤'], ['🍓', 'Pembe ama olmaz 🍓🚫']];
+  const NEED = 15;
+  let score = 0, items = [], spawnT = 0, n = 0, running = false, over = false;
+  let W = 0, H = 0, bw = 0, bx = 0, tx = 0;
+  function measure() {
+    W = L.clientWidth; H = L.clientHeight; bw = Math.min(W * .34, H * .3, 240);
+    bowl.style.width = bw + 'px'; bowl.style.height = bw * .5 + 'px';
+  }
+  measure(); bx = tx = W / 2;
+  listen(window, 'resize', measure);
+  const move = e => { tx = e.clientX; };
+  listen(stage, 'pointerdown', move); listen(stage, 'pointermove', move);
+
+  function spawn() {
+    n++;
+    const bad = n > 3 && Math.random() < .27, d = bad ? pick(BAD) : pick(GOOD), size = Math.min(W, H) * .085;
+    const e = el('div', 'item', d[0]); e.style.fontSize = size + 'px';
+    L.append(e);
+    items.push({ e, x: rnd(size, W - size), y: -size, vy: H * rnd(.24, .32) * (1 + score * .02), a: rnd(0, 6), bad, d, size });
+  }
+  function bump(c) { bin.classList.remove('squish', 'shake'); void bin.offsetWidth; bin.classList.add(c); }
+  function update() {
+    sc.textContent = `${score}/${NEED}`; bar.style.width = (score / NEED * 100) + '%';
+    const k = score / NEED; mound.style.transform = `scale(${.55 + .45 * k},${.08 + .92 * k})`;
+  }
+  function catchIt(it, top) {
+    if (it.bad) { score = Math.max(0, score - 1); Sound.bad(); toast(it.d[1]); bump('shake'); floatText(bx, top, '−1', 'bad'); }
+    else { score++; Sound.pop(1 + score * .03); bump('squish'); floatText(it.x, top, '+' + it.d[1]); }
+    update();
+    if (score >= NEED && !over) win();
+  }
+  function win() {
+    over = true;
+    items.forEach(it => it.e.style.opacity = 0);
+    tipE.style.opacity = 1; tipE.innerHTML = 'Diyarbakır usulü hazır! 🌯🍋';
+    Sound.win();
+    later(() => done(bowl.getBoundingClientRect()), 1200);
+  }
+  loop(dt => {
+    bx += (tx - bx) * Math.min(1, dt * 16); bx = Math.max(bw / 2, Math.min(W - bw / 2, bx));
+    bowl.style.transform = `translate3d(${bx - bw / 2}px,0,0)`;
+    if (!running) return;
+    if (!over) { spawnT -= dt; if (spawnT <= 0) { spawn(); spawnT = rnd(.55, .9); } }
+    const br = bowl.getBoundingClientRect(), top = br.top + br.height * .15;
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      it.y += it.vy * dt; it.a += dt * 2;
+      it.e.style.transform = `translate3d(${it.x - it.size / 2}px,${it.y - it.size / 2}px,0) rotate(${Math.sin(it.a) * 20}deg)`;
+      if (!over && it.y + it.size * .3 >= top && it.y < top + br.height * .45 && Math.abs(it.x - bx) < bw * .5) {
+        catchIt(it, top); it.e.remove(); items.splice(i, 1); continue;
+      }
+      if (it.y > H + it.size) { it.e.remove(); items.splice(i, 1); }
+    }
+  });
+  update();
+  return () => { running = true; later(() => { if (!over) tipE.style.opacity = 0; }, 4500); };
+}
+
+// ===== Bölüm 4: lego vazo =====
+function lvlLego(done) {
+  const L = el('div', 'lvl lego');
+  L.innerHTML = `<div class="lego-hud pill">🧱 Tuğla <b>0</b>/${VASE_W.length}</div><div class="lego-tip pill">Tuğla ortaya gelince <b>dokun</b> 👆</div>`;
+  stage.append(L);
+  const hudB = $('.lego-hud b', L), tipE = $('.lego-tip', L);
+  const plate = el('div', 'plate'); L.append(plate);
+  const ghost = el('div', 'lego-ghost'); L.append(ghost);
+  const placed = [];
+  let W, H, U, BH, baseY, cx, cur = null, curX = 0, dir = 1, phase = 'wait', y = 0, vy = 0, idx = 0;
+
+  function studs(b, w) {
+    const n = Math.max(2, Math.round(w / (BH * 1.05)));
+    b.style.setProperty('--sw', BH * .5 + 'px'); b.style.setProperty('--sh', BH * .24 + 'px'); b.style.setProperty('--h', BH + 'px');
+    let s = b.querySelector('.studs'); if (!s) { s = el('div', 'studs'); b.append(s); }
+    s.innerHTML = '<i></i>'.repeat(n);
+  }
+  function sizeBrick(b, w) { b.style.width = w + 'px'; b.style.height = BH + 'px'; studs(b, w); }
+  const slideTop = () => baseY - (idx + 1) * BH - Math.max(BH * 2.2, H * .12);
+  function layout() {
+    W = L.clientWidth; H = L.clientHeight; U = Math.min(W * .52, H * .34, 380); BH = U * .17; cx = W / 2;
+    baseY = H - Math.max(54, H * .09);
+    const pw = U * 1.5; plate.style.cssText = `left:${cx - pw / 2}px;top:${baseY}px;width:${pw}px;height:${BH * .7}px`;
+    plate.style.setProperty('--c', '#86d395'); studs(plate, pw);
+    placed.forEach((b, i) => { const w = U * VASE_W[i]; sizeBrick(b, w); b.style.left = (cx - w / 2) + 'px'; b.style.top = (baseY - (i + 1) * BH) + 'px'; });
+    if (cur) { const w = U * VASE_W[idx]; sizeBrick(cur, w); if (phase === 'slide') cur.style.top = slideTop() + 'px'; }
+    if (idx < VASE_W.length) { const w = U * VASE_W[idx]; ghost.style.cssText = `left:${cx - w / 2}px;top:${baseY - (idx + 1) * BH}px;width:${w}px;height:${BH}px`; }
+    else ghost.style.display = 'none';
+  }
+  function spawn() {
+    idx = placed.length;
+    cur = el('div', 'brick'); cur.style.setProperty('--c', VASE_C[idx]); L.append(cur);
+    const w = U * VASE_W[idx]; sizeBrick(cur, w);
+    curX = dir > 0 ? w / 2 + 10 : W - w / 2 - 10;
+    cur.style.left = (curX - w / 2) + 'px'; cur.style.top = slideTop() + 'px';
+    phase = 'slide'; layout();
+  }
+  function land() {
+    const w = U * VASE_W[idx], prevW = idx ? U * VASE_W[idx - 1] : U * 1.5;
+    const off = curX - cx, tol = Math.min(w, prevW) * .4;
+    if (Math.abs(off) <= tol) {
+      cur.classList.add('snap'); cur.style.left = (cx - w / 2) + 'px'; Sound.click();
+      const perfect = Math.abs(off) < w * .08, r = cur.getBoundingClientRect();
+      floatText(cx, r.top, perfect ? 'Mükemmel! ✨' : 'Klik! 🧱', perfect ? 'big' : '');
+      placed.push(cur); cur = null; phase = 'wait'; hudB.textContent = placed.length;
+      if (placed.length === VASE_W.length) { idx = placed.length; layout(); win(); }
+      else later(spawn, 380);
+    } else {
+      phase = 'fall'; Sound.bad();
+      const b = cur, s = off > 0 ? 1 : -1; cur = null;
+      b.animate([{ transform: 'translate(0,0) rotate(0deg)', opacity: 1 }, { transform: `translate(${s * W * .25}px,${H * .6}px) rotate(${s * 120}deg)`, opacity: 0 }], { duration: 800, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' }).onfinish = () => b.remove();
+      toast(pick(['Hop! Bir daha 🙈', 'Az kaldı! 🧱', 'Lego ustası ısınıyor 😄']));
+      later(spawn, 700);
+    }
+  }
+  function win() {
+    tipE.style.opacity = 1; tipE.innerHTML = 'Vazo hazır! 🌸';
+    Sound.win();
+    const top = baseY - VASE_W.length * BH; burst(cx, top, 30);
+    later(() => done({ left: cx - U / 2, top: top - U * .55, width: U, height: U * .5 }), 1200);
+  }
+  loop(dt => {
+    if (!cur) return;
+    const w = U * VASE_W[idx];
+    if (phase === 'slide') {
+      curX += dir * W * (.3 + idx * .035) * dt;
+      const minX = w / 2 + 8, maxX = W - w / 2 - 8;
+      if (curX > maxX) { curX = maxX; dir = -1; } if (curX < minX) { curX = minX; dir = 1; }
+      cur.style.left = (curX - w / 2) + 'px';
+    } else if (phase === 'drop') {
+      vy += H * 4.2 * dt; y += vy * dt;
+      const target = baseY - (idx + 1) * BH;
+      if (y >= target) { y = target; cur.style.top = y + 'px'; land(); } else cur.style.top = y + 'px';
+    }
+  });
+  listen(stage, 'pointerdown', () => { if (phase !== 'slide') return; phase = 'drop'; y = parseFloat(cur.style.top); vy = 0; });
+  listen(window, 'resize', layout);
+  layout();
+  return () => { spawn(); later(() => { if (placed.length < VASE_W.length) tipE.style.opacity = 0; }, 6000); };
+}
+
+// ===== Bölüm 5: Zilli =====
+function lvlZilli(done) {
+  const L = el('div', 'lvl zilli');
+  L.innerHTML = `<div class="z-win"></div><div class="z-frame">🧱🌸</div><div class="z-floor"></div><div class="z-rug"></div>
+    <div class="z-vase"></div>
+    <div class="z-cat-wrap"><div class="z-cushion"></div><div class="z-cat">😾</div><div class="z-name pill">Zilli</div></div>
+    <div class="z-meter pill"><span>Zilli'nin gönlü</span><div class="bar"><i></i></div></div>
+    <div class="z-tip pill">Parmağını Zilli'nin üstünde gezdir 🖐️</div>`;
+  stage.append(L);
+  const vase = $('.z-vase', L); vase.append(bouquet(4));
+  const cat = $('.z-cat', L), wrap = $('.z-cat-wrap', L), bar = $('.z-meter i', L), tipE = $('.z-tip', L);
+  const FACES = [[0, '😾'], [.2, '😼'], [.45, '🐱'], [.7, '😺'], [.88, '😸']];
+  let love = 0, lastPet = 0, acc = 0, running = false, over = false, lastP = null, warned = false;
+  const inside = e => { const r = cat.getBoundingClientRect(), m = r.width * .1; return e.clientX > r.left - m && e.clientX < r.right + m && e.clientY > r.top - m && e.clientY < r.bottom + m; };
+  const heart = e => floatText(e.clientX, e.clientY, pick(['💗', 'mrrr', '💕', 'mır mır', '💖']));
+  function render() {
+    bar.style.width = love * 100 + '%';
+    let f = '😾'; for (const [k, e] of FACES) if (love >= k) f = e;
+    if (cat.textContent !== f) cat.textContent = f;
+  }
+  function add(v) { love = Math.min(1, love + v); render(); if (love >= 1 && !over) win(); }
+  function win() {
+    over = true; cat.textContent = '😻'; cat.classList.remove('pet'); Sound.purr(false); Sound.win();
+    vase.classList.remove('wobble');
+    wrap.insertAdjacentHTML('beforeend', '<div class="stamp">ZİLLİ ONAYLI ✅</div>');
+    tipE.textContent = 'Zilli buketi onayladı! 🐾';
+    later(() => done(vase.getBoundingClientRect()), 1600);
+  }
+  listen(stage, 'pointerdown', e => {
+    lastP = { x: e.clientX, y: e.clientY };
+    if (running && !over && inside(e)) { add(.03); heart(e); lastPet = performance.now(); }
+  });
+  listen(stage, 'pointermove', e => {
+    if (!running || over || !lastP) return;
+    const d = Math.hypot(e.clientX - lastP.x, e.clientY - lastP.y); lastP = { x: e.clientX, y: e.clientY };
+    if (!inside(e)) return;
+    const size = cat.getBoundingClientRect().width;
+    add(d / (size * 12)); acc += d; if (acc > size * .35) { acc = 0; heart(e); }
+    lastPet = performance.now(); cat.classList.add('pet'); Sound.purr(true);
+    if (warned) { warned = false; tipE.textContent = 'Böyle devam! 💗'; }
+  });
+  const up = () => { lastP = null; };
+  listen(stage, 'pointerup', up); listen(stage, 'pointercancel', up);
+  loop(dt => {
+    if (!running || over) return;
+    const idle = performance.now() - lastPet;
+    if (idle > 250) { cat.classList.remove('pet'); Sound.purr(false); }
+    if (idle > 1800 && love > .05) {
+      love = Math.max(0, love - dt * .025); render();
+      vase.classList.add('wobble');
+      if (!warned) { warned = true; tipE.textContent = 'Zilli vazoya bakıyor... 👀 Sevmeye devam!'; }
+    } else vase.classList.remove('wobble');
+  });
+  return () => { running = true; lastPet = performance.now(); };
+}
+
+// ===== final =====
+function finale() {
+  clearStage(); setHud(true);
+  const L = el('div', 'lvl final');
+  L.innerHTML = `<div class="rain"></div><div class="f-bq"></div>
+    <div class="msg"><div class="msg-lines"></div>
+      <div class="final-btns"><button class="btn ghost" data-a="cargo">Gerçeğini ne zaman alacaksın? 🤔</button><button class="btn ghost small" data-a="again">Baştan oyna 🔁</button></div>
+      <div class="final-note"></div></div>`;
+  stage.append(L);
+  $('.f-bq', L).append(bouquet(5));
+  rain($('.rain', L));
+  const lines = $('.msg-lines', L);
+  let t = 1300;
+  CONFIG.finalMessage.forEach((s, i) => {
+    const cls = !s ? 'sp' : i === 0 ? 'hi' : s.startsWith('—') ? 'sig' : s.startsWith('P.S.') ? 'ps' : '';
+    const p = el('p', cls, s || ''); lines.append(p);
+    later(() => p.classList.add('on'), t); t += s ? 750 : 150;
+  });
+  later(() => { $('.final-btns', L).classList.add('on'); const n = $('.final-note', L); n.textContent = CONFIG.finalNote; n.classList.add('on'); }, t + 300);
+  later(() => { burst(innerWidth / 2, innerHeight * .35, 50); Sound.win(); }, 300);
+  $('[data-a=cargo]', L).addEventListener('click', () => { Sound.click(); cargo(); });
+  $('[data-a=again]', L).addEventListener('click', () => { Sound.click(); state.peonies = 0; setLove(0); renderSlots(); intro(); });
+}
+function cargo() {
+  const years = Math.round(CONFIG.km * 1e6 / 31557600);
+  modal({
+    icon: '🐌', title: 'Kargo Takip',
+    html: `<div class="track">
+      <div><span>Firma</span><b>Salyangoz Kargo</b></div>
+      <div><span>Kurye</span><b>Kargo Kemal 🐌</b></div>
+      <div><span>Rota</span><b>${CONFIG.fromCity} → ${CONFIG.toCity}</b></div>
+      <div><span>Mesafe</span><b>~${CONFIG.km} km</b></div>
+      <div><span>Hız</span><b>1 mm/sn</b></div>
+      <div><span>Tahmini teslimat</span><b>~${years} yıl</b></div>
+      <div class="trk-bar"><i></i></div><small>Teslimat durumu: %0,0000001</small></div>
+      <p>${CONFIG.cargoExtra}</p>`,
+    btn: 'Tamam 😄',
+  });
+}
+
+// ===== başlat =====
+renderSlots(); setLove(0);
+const q = parseInt(new URLSearchParams(location.search).get('bolum'), 10);
+if (q >= 1 && q <= 5) { state.peonies = q - 1; setLove((q - 1) * 20); renderSlots(); playLevel(q - 1); }
+else if (q >= 6) { state.peonies = 5; setLove(100); renderSlots(); finale(); }
+else intro();
+})();
+</script>
+</body>
+</html>
